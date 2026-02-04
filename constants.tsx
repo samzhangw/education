@@ -504,11 +504,18 @@ export const IMPORTANT_DATES: ImportantDate[] = [
     isHighlight: true,
   },
 
-  // --- High School Department Test ---
+  // --- High School Department Test (115 分科測驗 & 分發入學) ---
   {
     date: '115/06/03 - 06/16',
     title: '分科測驗報名',
-    description: '115學年度分科測驗報名。',
+    description: '115學年度分科測驗報名 (至 6/16 下午 5 點)。',
+    category: ['high_school'],
+    isHighlight: false,
+  },
+  {
+    date: '115/07/07',
+    title: '應考資訊與考場查詢',
+    description: '上午 9 點起開放查詢分科測驗考場。',
     category: ['high_school'],
     isHighlight: false,
   },
@@ -522,14 +529,28 @@ export const IMPORTANT_DATES: ImportantDate[] = [
   {
     date: '115/07/29',
     title: '分科測驗放榜',
-    description: '公佈成績及五標。',
+    description: '上午 9 點公佈成績及五標，並開放成績複查 (至 8/3)。',
+    category: ['high_school'],
+    isHighlight: true,
+  },
+  {
+    date: '115/07/29 - 08/04',
+    title: '分發入學繳費',
+    description: '分發入學登記費繳交 (至 8/4 中午 12 點止)。',
     category: ['high_school'],
     isHighlight: false,
   },
   {
-    date: '115/08/13 上午9點',
+    date: '115/08/01 - 08/04',
+    title: '登記選填志願',
+    description: '網路登記分發志願 (至 8/4 下午 4 點 30 分止)。',
+    category: ['high_school'],
+    isHighlight: true,
+  },
+  {
+    date: '115/08/13',
     title: '大學分發放榜',
-    description: '大學分發入學錄取公告。',
+    description: '上午 9 點公告大學分發入學錄取結果 (8/15 截止下載)。',
     category: ['high_school'],
     isHighlight: true,
   },
