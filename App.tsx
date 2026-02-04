@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { CATEGORIES, ADMISSION_PATHS, IMPORTANT_DATES, LOGGING_API_URL } from './constants';
+import { CATEGORIES, ADMISSION_PATHS, IMPORTANT_DATES, LOGGING_API_URL, PATH_KEYWORDS } from './constants';
 import { StudentCategory, ImportantDate, AdmissionPath } from './types';
-import { GraduationCap, Calendar, Info, ArrowRight, CheckCircle2, ExternalLink, Timer, AlertCircle, Clock, Menu, X, LayoutGrid, Mail, Share2, Check, Copy, ChevronRight, Sparkles, ChevronDown, User, ArrowRightLeft, Star, CalendarDays, Printer, MousePointerClick, Target, Trophy, ChevronRightCircle, Zap } from 'lucide-react';
+import { GraduationCap, Calendar, Info, ArrowRight, CheckCircle2, ExternalLink, Timer, AlertCircle, Clock, Menu, X, LayoutGrid, Mail, Share2, Check, Copy, ChevronRight, Sparkles, ChevronDown, User, ArrowRightLeft, Star, CalendarDays, Printer, MousePointerClick, Target, Trophy, ChevronRightCircle, Zap, Filter, Search } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
 import ComparisonModal from './ComparisonModal';
 import PrintScheduleModal from './PrintScheduleModal';
@@ -123,6 +123,8 @@ export default function App() {
   const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
   const [selectedPathDetail, setSelectedPathDetail] = useState<AdmissionPath | null>(null);
+  
+  const [timelineFilters, setTimelineFilters] = useState<string[]>([]);
 
   const activePaths = ADMISSION_PATHS[activeCategory];
   
@@ -134,6 +136,11 @@ export default function App() {
   useEffect(() => {
     sendUserLog('page_view', 'home_loaded');
   }, []);
+
+  // Reset filters when category changes
+  useEffect(() => {
+    setTimelineFilters(activePaths.map(p => p.id));
+  }, [activeCategory, activePaths]);
 
   useEffect(() => {
     const now = new Date();
@@ -170,6 +177,34 @@ export default function App() {
   const handleCountdownClick = (toolName: string, url: string) => {
     sendUserLog('click_external_tool', toolName, url);
   };
+
+  const toggleTimelineFilter = (id: string) => {
+    setTimelineFilters(prev => 
+      prev.includes(id) 
+        ? prev.filter(p => p !== id) 
+        : [...prev, id]
+    );
+  };
+
+  const handleSearchBrochure = (e: React.MouseEvent, path: AdmissionPath) => {
+    e.stopPropagation();
+    const query = `115學年度 ${path.title} 簡章`;
+    window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, '_blank');
+    sendUserLog('search_brochure', path.id, path.title);
+  };
+
+  // Filter Logic based on Keywords
+  const filteredDates = activeDates.filter(date => {
+    if (timelineFilters.length === 0) return false;
+    
+    // Check if date matches keywords of ANY selected filter
+    return timelineFilters.some(pathId => {
+      const keywords = PATH_KEYWORDS[pathId] || [];
+      return keywords.some(k => 
+        date.title.includes(k) || date.description.includes(k)
+      );
+    });
+  });
 
   const categoryExams = MAJOR_EXAMS[activeCategory];
   const sortedExams = [...categoryExams].sort((a, b) => {
@@ -228,7 +263,7 @@ export default function App() {
           <div className="flex justify-between items-center h-16 sm:h-20">
             <div className="flex items-center gap-3 group cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500 to-violet-500 rounded-xl blur-sm opacity-50 group-hover:opacity-75 transition-opacity"></div>
+                <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500 to-violet-500 rounded-xl blur-3xl opacity-50 group-hover:opacity-75 transition-opacity"></div>
                 <div className="relative bg-gradient-to-br from-indigo-600 to-violet-700 p-2.5 rounded-xl text-white shadow-inner">
                   <GraduationCap className="h-6 w-6" />
                 </div>
@@ -753,18 +788,27 @@ export default function App() {
                         )}
                       </div>
                     </div>
-                    {path.link && (
-                      <a 
-                        href={path.link} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-50 text-slate-600 text-sm font-bold hover:bg-indigo-50 hover:text-indigo-600 transition-colors shadow-sm hover:shadow border border-slate-200 hover:border-indigo-100"
+                    <div className="flex flex-wrap gap-3 mt-4 md:mt-0">
+                      <button
+                        onClick={(e) => handleSearchBrochure(e, path)}
+                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white text-indigo-600 text-sm font-bold border border-indigo-100 hover:bg-indigo-50 transition-colors shadow-sm"
                       >
-                        官方網站
-                        <ExternalLink className="w-4 h-4" />
-                      </a>
-                    )}
+                        <Search className="w-4 h-4" />
+                        搜尋簡章
+                      </button>
+                      {path.link && (
+                        <a 
+                          href={path.link} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-50 text-slate-600 text-sm font-bold hover:bg-indigo-50 hover:text-indigo-600 transition-colors shadow-sm hover:shadow border border-slate-200 hover:border-indigo-100"
+                        >
+                          官方網站
+                          <ExternalLink className="w-4 h-4" />
+                        </a>
+                      )}
+                    </div>
                   </div>
 
                   <p className="text-slate-600 mb-8 leading-relaxed text-lg font-medium">
@@ -811,8 +855,8 @@ export default function App() {
 
           {/* Right Column: Timeline (Sticky) */}
           <div className="lg:col-span-5">
-            <div className="sticky top-28 space-y-8">
-              <div id="timeline" className="scroll-mt-32 flex items-center justify-between">
+            <div className="sticky top-28 space-y-4">
+              <div id="timeline" className="scroll-mt-32 flex items-center justify-between mb-4">
                 <div className="flex items-center gap-4">
                   <div className="p-3 bg-white text-amber-500 rounded-2xl shadow-sm border border-slate-100">
                     <Calendar className="w-6 h-6" />
@@ -831,66 +875,107 @@ export default function App() {
                 </button>
               </div>
 
-              <div className="glass-card rounded-[2.5rem] p-6 sm:p-8 shadow-xl border border-white/60 max-h-[85vh] overflow-y-auto custom-scrollbar">
-                 <div className="space-y-6 relative z-10 px-2">
-                  {activeDates.map((item, index) => {
-                    const status = getEventStatus(item.date);
-                    const isPast = status === 'past';
-                    const isSoon = status === 'soon';
-                    const { month, day } = getDateParts(item.date);
-                    
+              {/* Timeline Filter Chips */}
+              <div className="flex flex-wrap gap-2 mb-2">
+                 {activePaths.map((path) => {
+                    const isSelected = timelineFilters.includes(path.id);
                     return (
-                      <div key={index} className={`relative flex gap-4 group ${isPast ? 'opacity-60 grayscale-[0.5]' : 'opacity-100'}`}>
-                        
-                        {/* Date Column */}
-                        <div className="flex flex-col items-center min-w-[3.5rem] sm:min-w-[4rem] pt-1">
-                           <div className={`text-xs sm:text-sm font-black tracking-wider ${item.isHighlight ? 'text-indigo-600' : 'text-slate-400'}`}>
-                             {month}
-                           </div>
-                           <div className={`text-xl sm:text-2xl font-black leading-none mb-1 ${item.isHighlight ? 'text-indigo-600' : 'text-slate-700'}`}>
-                             {day}
-                           </div>
-                           {/* Connector Line */}
-                           <div className={`flex-1 w-0.5 my-2 rounded-full ${index === activeDates.length - 1 ? 'bg-transparent' : 'bg-slate-200'}`}></div>
-                        </div>
-
-                        {/* Content Card */}
-                        <div className={`flex-1 p-5 rounded-2xl border transition-all duration-300 relative overflow-hidden mb-2
-                            ${item.isHighlight 
-                                ? 'bg-gradient-to-br from-white to-amber-50 border-amber-200 shadow-lg shadow-amber-100/50 hover:shadow-xl hover:scale-[1.02]' 
-                                : 'bg-white border-slate-100 shadow-sm hover:shadow-md hover:border-indigo-200 hover:translate-x-1'
-                            }
-                        `}>
-                            {item.isHighlight && (
-                                <div className="absolute top-0 right-0 p-2">
-                                    <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
-                                </div>
-                            )}
-                            
-                            {/* Original Date String (for ranges) */}
-                             <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1 flex items-center gap-1">
-                                <CalendarDays className="w-3 h-3" />
-                                {item.date}
-                             </div>
-
-                            <h3 className={`font-bold text-lg mb-2 ${item.isHighlight ? 'text-slate-800' : 'text-slate-700'}`}>
-                                {item.title}
-                            </h3>
-                            
-                            <p className="text-sm text-slate-500 font-medium leading-relaxed">
-                                {item.description}
-                            </p>
-
-                            {isSoon && (
-                                <div className="mt-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-100 text-rose-600 text-xs font-bold animate-pulse">
-                                    <Clock className="w-3 h-3" />
-                                    即將到來
-                                </div>
-                            )}
-                        </div>
-                      </div>
+                       <button
+                          key={path.id}
+                          onClick={() => toggleTimelineFilter(path.id)}
+                          className={`
+                             px-3 py-1.5 rounded-full text-xs font-bold transition-all border
+                             ${isSelected 
+                                ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm shadow-indigo-200' 
+                                : 'bg-white text-slate-400 border-slate-200 hover:border-indigo-300 hover:text-indigo-500'
+                             }
+                          `}
+                       >
+                          {path.title}
+                       </button>
                     )
-                  })}
+                 })}
+                 <div className="flex items-center gap-1.5 text-xs text-slate-400 font-medium px-2">
+                    <Filter className="w-3 h-3" />
+                    篩選
+                 </div>
+              </div>
+
+              <div className="glass-card rounded-[2.5rem] p-6 sm:p-8 shadow-xl border border-white/60 max-h-[75vh] overflow-y-auto custom-scrollbar">
+                 <div className="space-y-6 relative z-10 px-2">
+                  {filteredDates.length > 0 ? (
+                    filteredDates.map((item, index) => {
+                      const status = getEventStatus(item.date);
+                      const isPast = status === 'past';
+                      const isSoon = status === 'soon';
+                      const { month, day } = getDateParts(item.date);
+                      
+                      return (
+                        <div key={index} className={`relative flex gap-4 group ${isPast ? 'opacity-60 grayscale-[0.5]' : 'opacity-100'}`}>
+                          
+                          {/* Date Column */}
+                          <div className="flex flex-col items-center min-w-[3.5rem] sm:min-w-[4rem] pt-1">
+                             <div className={`text-xs sm:text-sm font-black tracking-wider ${item.isHighlight ? 'text-indigo-600' : 'text-slate-400'}`}>
+                               {month}
+                             </div>
+                             <div className={`text-xl sm:text-2xl font-black leading-none mb-1 ${item.isHighlight ? 'text-indigo-600' : 'text-slate-700'}`}>
+                               {day}
+                             </div>
+                             {/* Connector Line */}
+                             <div className={`flex-1 w-0.5 my-2 rounded-full ${index === filteredDates.length - 1 ? 'bg-transparent' : 'bg-slate-200'}`}></div>
+                          </div>
+
+                          {/* Content Card */}
+                          <div className={`flex-1 p-5 rounded-2xl border transition-all duration-300 relative overflow-hidden mb-2
+                              ${item.isHighlight 
+                                  ? 'bg-gradient-to-br from-white to-amber-50 border-amber-200 shadow-lg shadow-amber-100/50 hover:shadow-xl hover:scale-[1.02]' 
+                                  : 'bg-white border-slate-100 shadow-sm hover:shadow-md hover:border-indigo-200 hover:translate-x-1'
+                              }
+                          `}>
+                              {item.isHighlight && (
+                                  <div className="absolute top-0 right-0 p-2">
+                                      <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+                                  </div>
+                              )}
+                              
+                              {/* Original Date String (for ranges) */}
+                               <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1 flex items-center gap-1">
+                                  <CalendarDays className="w-3 h-3" />
+                                  {item.date}
+                               </div>
+
+                              <h3 className={`font-bold text-lg mb-2 ${item.isHighlight ? 'text-slate-800' : 'text-slate-700'}`}>
+                                  {item.title}
+                              </h3>
+                              
+                              <p className="text-sm text-slate-500 font-medium leading-relaxed">
+                                  {item.description}
+                              </p>
+
+                              {isSoon && (
+                                  <div className="mt-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-100 text-rose-600 text-xs font-bold animate-pulse">
+                                      <Clock className="w-3 h-3" />
+                                      即將到來
+                                  </div>
+                              )}
+                          </div>
+                        </div>
+                      )
+                    })
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-10 text-center">
+                        <div className="p-4 bg-slate-50 rounded-full mb-4">
+                           <Filter className="w-8 h-8 text-slate-300" />
+                        </div>
+                        <p className="text-slate-500 font-medium">沒有符合篩選條件的日程</p>
+                        <button 
+                           onClick={() => setTimelineFilters(activePaths.map(p => p.id))}
+                           className="mt-2 text-indigo-600 text-sm font-bold hover:underline"
+                        >
+                           顯示所有日程
+                        </button>
+                    </div>
+                  )}
                  </div>
               </div>
             </div>

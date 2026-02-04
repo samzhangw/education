@@ -1,16 +1,37 @@
 import React from 'react';
 import { AdmissionPath, ImportantDate, StudentCategory } from './types';
-import { BookOpen, Award, Users, PenTool, GraduationCap, Star, TrendingUp, Cpu, Calendar, ClipboardCheck, Search, Lightbulb, Target } from 'lucide-react';
+import { BookOpen, Award, Users, PenTool, GraduationCap, Star, TrendingUp, Cpu, Calendar, ClipboardCheck, Search, Lightbulb, Target, Sparkles } from 'lucide-react';
 
 // TODO: 請在此處填入您的 Google Apps Script 部署網址 (Web App URL)
 // 例如: "https://script.google.com/macros/s/......./exec"
 export const LOGGING_API_URL = "https://script.google.com/macros/s/AKfycbwqw4JzUApQ1jHG5csiIccEWJiwvBorg4VZeydabKtPqH5fN-TIhOtY5jhfthgb_vAx/exec"; 
 
 export const CATEGORIES: { id: StudentCategory; label: string; description: string }[] = [
-  { id: 'high_school', label: '普通高中', description: '學測 / 分科測驗 / 大學申請' },
+  { id: 'high_school', label: '普通高中', description: '學測 / 繁星 / 申請 / 分科' },
   { id: 'vocational', label: '技術型高中', description: '統測 / 甄選 / 登記分發' },
   { id: 'junior_college', label: '五專生', description: '二技 / 插大轉學考' },
 ];
+
+// Keywords mapping to filter dates based on selected paths
+export const PATH_KEYWORDS: Record<string, string[]> = {
+  // High School
+  'individual': ['學測', '英聽', '申請', '面試', '篩選', '備審'],
+  'star': ['學測', '英聽', '繁星'],
+  'placement': ['學測', '分科', '分發', '志願'],
+  'tech_apply': ['學測', '四技申請', '四技二階'],
+  'special': ['特殊選才'],
+  
+  // Vocational
+  'tech_special': ['特殊選才'],
+  'selection': ['統測', '甄選', '備審'],
+  'registration': ['統測', '登記分發', '分發', '志願'],
+  'tech_star': ['繁星'],
+  'tech_excellence': ['技優'],
+  
+  // Junior College
+  'two_year_college': ['二技'],
+  'transfer': ['轉學', '插大']
+};
 
 export const ADMISSION_PATHS: Record<StudentCategory, AdmissionPath[]> = {
   high_school: [
@@ -40,6 +61,31 @@ export const ADMISSION_PATHS: Record<StudentCategory, AdmissionPath[]> = {
       link: 'https://www.cac.edu.tw/',
     },
     {
+      id: 'star',
+      title: '繁星推薦',
+      icon: <Star className="w-6 h-6 text-amber-500" />,
+      description: '根據在校成績排名與學測成績進行推薦，免面試 (醫學系除外)。',
+      details: [
+        '在校學業成績全校排名 (前20%~50%)',
+        '學測成績需達檢定標準',
+        '分發錄取後不得參加申請入學',
+        '第8類學群 (醫學/牙醫) 需第二階段面試'
+      ],
+      suitability: '校排名前段、在校成績穩定優異者',
+      pros: [
+        '最早放榜，提早成為準大學生',
+        '1-7類學群免面試、免備審',
+        '私校或偏鄉學生有機會進入頂大'
+      ],
+      cons: [
+        '在校成績需維持三年，壓力大',
+        '一輪分發每校僅能推薦一人，校內競爭',
+        '錄取後不得放棄 (除非放棄後參加分科)'
+      ],
+      percentage: '約 15%',
+      link: 'https://www.cac.edu.tw/',
+    },
+    {
       id: 'tech_apply',
       title: '四技申請入學',
       icon: <Cpu className="w-6 h-6 text-teal-500" />,
@@ -63,30 +109,6 @@ export const ADMISSION_PATHS: Record<StudentCategory, AdmissionPath[]> = {
       ],
       percentage: '獨立名額',
       link: 'https://www.jctv.ntut.edu.tw/caac/',
-    },
-    {
-      id: 'star',
-      title: '繁星推薦',
-      icon: <Star className="w-6 h-6 text-amber-500" />,
-      description: '根據在校成績排名與學測成績進行推薦，免面試。',
-      details: [
-        '在校學業成績全校排名 (前20%~50%)',
-        '學測成績需達檢定標準',
-        '分發錄取後不得參加申請入學',
-      ],
-      suitability: '校排名前段、在校成績穩定優異者',
-      pros: [
-        '最早放榜，提早成為準大學生',
-        '不需準備備審資料與面試',
-        '私校或偏鄉學生有機會進入頂大'
-      ],
-      cons: [
-        '在校成績需維持三年，壓力大',
-        '一輪分發每校僅能推薦一人，校內競爭',
-        '錄取後不得放棄 (除非放棄後參加分科)'
-      ],
-      percentage: '約 15%',
-      link: 'https://www.cac.edu.tw/',
     },
     {
       id: 'placement',
@@ -138,6 +160,30 @@ export const ADMISSION_PATHS: Record<StudentCategory, AdmissionPath[]> = {
     },
   ],
   vocational: [
+    {
+      id: 'tech_special',
+      title: '科技校院特殊選才',
+      icon: <Sparkles className="w-6 h-6 text-pink-500" />,
+      description: '不採計統測成績，針對具特殊經歷、專長、弱勢或不同教育資歷學生。',
+      details: [
+        '需符合特定報名資格 (如技能優異、特殊經歷)',
+        '最多可報名 5 個校系科(組)',
+        '採計書面審查與指定項目甄審 (面試/實作)'
+      ],
+      suitability: '具特殊專長、技能優異或不同教育資歷者',
+      pros: [
+        '不需統測成績，減輕學科壓力',
+        '提早於 2 月放榜，最早確認學校',
+        '重視實務能力與特殊表現'
+      ],
+      cons: [
+        '名額稀少，競爭激烈',
+        '資格審查嚴格',
+        '需花費時間準備備審與面試'
+      ],
+      percentage: '約 1-2%',
+      link: 'https://www.jctv.ntut.edu.tw/enter42/s42/',
+    },
     {
       id: 'selection',
       title: '甄選入學',
@@ -319,8 +365,8 @@ export const IMPORTANT_DATES: ImportantDate[] = [
   },
   {
     date: '114/11/04',
-    title: '大學申請簡章公告',
-    description: '115學年度大學申請入學招生簡章公告。',
+    title: '繁星/申請簡章公告',
+    description: '115學年度繁星推薦與大學申請入學招生簡章公告。',
     category: ['high_school'],
     isHighlight: false,
   },
@@ -362,6 +408,20 @@ export const IMPORTANT_DATES: ImportantDate[] = [
   
   // --- University Application (High School) ---
   {
+    date: '115/03/11 - 03/12',
+    title: '繁星推薦報名',
+    description: '高中學校向甄選委員會辦理繁星報名 (含繳費)。',
+    category: ['high_school'],
+    isHighlight: true,
+  },
+  {
+    date: '115/03/18',
+    title: '繁星放榜 (1-7類)',
+    description: '公告第1-7類錄取名單及第8類(醫牙)一階篩選結果。',
+    category: ['high_school'],
+    isHighlight: true,
+  },
+  {
     date: '115/03/19 - 03/25',
     title: '四技申請報名',
     description: '四技申請入學個別報名 (3/19-3/24繳費)。',
@@ -377,7 +437,7 @@ export const IMPORTANT_DATES: ImportantDate[] = [
   },
   {
     date: '115/03/31',
-    title: '一階篩選結果 (大學/四技)',
+    title: '一階篩選結果',
     description: '大學申請入學及四技申請入學一階篩選結果公告。',
     category: ['high_school'],
     isHighlight: true,
@@ -398,8 +458,8 @@ export const IMPORTANT_DATES: ImportantDate[] = [
   },
   {
     date: '115/05/14 - 05/31',
-    title: '大學二階面試',
-    description: '大學各校系辦理第二階段指定項目甄試。',
+    title: '大學二階/繁星面試',
+    description: '大學申請入學指定項目甄試及繁星第8類二階面試。',
     category: ['high_school'],
     isHighlight: true,
   },
@@ -409,6 +469,13 @@ export const IMPORTANT_DATES: ImportantDate[] = [
     description: '四技申請入學錄取名單公告。',
     category: ['high_school'],
     isHighlight: false,
+  },
+  {
+    date: '115/06/03',
+    title: '繁星第8類放榜',
+    description: '上午 9 點公告繁星推薦第8類學群錄取結果。',
+    category: ['high_school'],
+    isHighlight: true,
   },
   {
     date: '115/06/04',
@@ -427,6 +494,20 @@ export const IMPORTANT_DATES: ImportantDate[] = [
 
   // --- Vocational Dates ---
   {
+    date: '114/11/20',
+    title: '科技校院特殊選才簡章',
+    description: '115學年度科技校院特殊選才入學招生簡章公告。',
+    category: ['vocational'],
+    isHighlight: false,
+  },
+  {
+    date: '114/11/20',
+    title: '科技繁星簡章公告',
+    description: '115學年度科技校院繁星計畫招生簡章公告。',
+    category: ['vocational'],
+    isHighlight: false,
+  },
+  {
     date: '114/12/04',
     title: '聯合登記分發簡章',
     description: '115學年度聯合登記分發簡章公告。',
@@ -441,11 +522,116 @@ export const IMPORTANT_DATES: ImportantDate[] = [
     isHighlight: true,
   },
   {
+    date: '114/12/15 - 12/19',
+    title: '科技校院特殊選才報名',
+    description: '繳費至12/18止。需上網登錄資料、繳費並上傳資格審查文件。',
+    category: ['vocational'],
+    isHighlight: true,
+  },
+  {
+    date: '115/01/08',
+    title: '特殊選才資格審查結果',
+    description: '上午 10:00 起公告資格審查結果 (1/9 中午前複查)。',
+    category: ['vocational'],
+    isHighlight: false,
+  },
+  {
+    date: '115/01/12 - 01/16',
+    title: '特殊選才二階繳費上傳',
+    description: '向各招生學校繳交指定項目甄審費及網路上傳備審資料。',
+    category: ['vocational'],
+    isHighlight: false,
+  },
+  {
+    date: '115/01/23 - 01/31',
+    title: '特殊選才指定項目甄審',
+    description: '各招生學校辦理面試、實作等指定項目甄審。',
+    category: ['vocational'],
+    isHighlight: true,
+  },
+  {
+    date: '115/02/02',
+    title: '特殊選才甄審總成績',
+    description: '上午 10:00 起查詢甄審總成績 (2/3 中午前複查)。',
+    category: ['vocational'],
+    isHighlight: false,
+  },
+  {
+    date: '115/02/04',
+    title: '各校公告甄審結果',
+    description: '上午 10:00 起各招生學校公告甄審結果 (2/5 中午前複查)。',
+    category: ['vocational'],
+    isHighlight: false,
+  },
+  {
+    date: '115/02/04 - 02/06',
+    title: '特殊選才登記志願',
+    description: '正備取生至委員會網站登記就讀志願序 (至2/6 17:00止)。',
+    category: ['vocational'],
+    isHighlight: true,
+  },
+  {
+    date: '115/02/11',
+    title: '特殊選才分發放榜',
+    description: '上午 10:00 公告就讀志願序統一分發結果。',
+    category: ['vocational'],
+    isHighlight: true,
+  },
+  {
+    date: '115/03/03',
+    title: '特殊選才報到截止',
+    description: '依各校規定辦理報到 (12:00前)，或聲明放棄錄取資格。',
+    category: ['vocational'],
+    isHighlight: false,
+  },
+  {
+    date: '115/03/11 - 03/18',
+    title: '科技繁星報名',
+    description: '被推薦考生進行網路報名 (學校於3/19前寄件)。',
+    category: ['vocational'],
+    isHighlight: true,
+  },
+  {
+    date: '115/04/07',
+    title: '科技繁星成績審查',
+    description: '公告考生報名資格及比序成績審查結果。',
+    category: ['vocational'],
+    isHighlight: false,
+  },
+  {
+    date: '115/04/14',
+    title: '科技繁星排名查詢',
+    description: '考生比序排名網路查詢 (4/15 中午前複查)。',
+    category: ['vocational'],
+    isHighlight: true,
+  },
+  {
+    date: '115/04/22 - 04/28',
+    title: '科技繁星選填志願',
+    description: '考生網路選填登記就讀志願序 (至28日 17:00 止)。',
+    category: ['vocational'],
+    isHighlight: true,
+  },
+  {
     date: '115/04/25 - 04/26',
     title: '統一入學測驗 (統測)',
     description: '115學年度四技二專統測考試 (週六、週日)。',
     category: ['vocational'],
     isHighlight: true,
+  },
+  {
+    date: '115/05/05',
+    title: '科技繁星放榜',
+    description: '上午 10:00 公告統一分發錄取名單。',
+    category: ['vocational'],
+    isHighlight: true,
+  },
+  {
+    date: '115/05/12',
+    title: '科技繁星放棄截止',
+    description: '中午 12:00 前聲明放棄錄取資格截止。',
+    category: ['vocational'],
+    isHighlight: false,
   },
   {
     date: '115/05/14',

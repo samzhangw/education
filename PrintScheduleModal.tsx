@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { AdmissionPath, ImportantDate, StudentCategory } from './types';
+import { PATH_KEYWORDS } from './constants';
 import { X, Printer, Check, Calendar, FileCheck, ArrowRight } from 'lucide-react';
 
 interface PrintScheduleModalProps {
@@ -9,26 +10,6 @@ interface PrintScheduleModalProps {
   paths: AdmissionPath[];
   dates: ImportantDate[];
 }
-
-// Keywords mapping to filter dates based on selected paths
-const PATH_KEYWORDS: Record<string, string[]> = {
-  // High School
-  'individual': ['學測', '英聽', '申請', '面試', '篩選', '備審'],
-  'star': ['學測', '英聽', '繁星'],
-  'placement': ['學測', '分科', '分發', '志願'],
-  'tech_apply': ['學測', '四技申請', '四技二階'],
-  'special': ['特殊選才'],
-  
-  // Vocational
-  'selection': ['統測', '甄選', '備審'],
-  'registration': ['統測', '登記分發', '分發', '志願'],
-  'tech_star': ['繁星'],
-  'tech_excellence': ['技優'],
-  
-  // Junior College
-  'two_year_college': ['二技'],
-  'transfer': ['轉學', '插大']
-};
 
 export default function PrintScheduleModal({ isOpen, onClose, category, paths, dates }: PrintScheduleModalProps) {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
