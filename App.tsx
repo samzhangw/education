@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { CATEGORIES, ADMISSION_PATHS, IMPORTANT_DATES, LOGGING_API_URL } from './constants';
 import { StudentCategory, ImportantDate, AdmissionPath } from './types';
-import { GraduationCap, Calendar, Info, ArrowRight, CheckCircle2, ExternalLink, Timer, AlertCircle, Clock, Menu, X, LayoutGrid, Mail, Share2, Check, Copy, ChevronRight, Sparkles, ChevronDown, User, ArrowRightLeft, Star, CalendarDays, Printer, MousePointerClick, Target, Trophy } from 'lucide-react';
+import { GraduationCap, Calendar, Info, ArrowRight, CheckCircle2, ExternalLink, Timer, AlertCircle, Clock, Menu, X, LayoutGrid, Mail, Share2, Check, Copy, ChevronRight, Sparkles, ChevronDown, User, ArrowRightLeft, Star, CalendarDays, Printer, MousePointerClick, Target, Trophy, ChevronRightCircle, Zap } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
 import ComparisonModal from './ComparisonModal';
 import PrintScheduleModal from './PrintScheduleModal';
@@ -62,7 +62,7 @@ const getDateParts = (dateStr: string) => {
 
 // Logging function to Google Apps Script
 const sendUserLog = async (action: string, detail: string, extra?: string) => {
-  if (!LOGGING_API_URL || LOGGING_API_URL === "") return;
+  if (!LOGGING_API_URL || (LOGGING_API_URL as string) === "") return;
 
   try {
     // We use no-cors to avoid CORS errors from Google Apps Script.
@@ -213,14 +213,13 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen font-sans pb-24 relative overflow-hidden">
+    <div className="min-h-screen font-sans pb-24 relative overflow-hidden bg-slate-50">
       
       {/* Background Decor */}
       <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute inset-0 bg-slate-50 bg-grid-pattern opacity-60"></div>
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-float"></div>
-        <div className="absolute top-20 left-0 w-[400px] h-[400px] bg-rose-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-float" style={{ animationDelay: '2s' }}></div>
-        <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-emerald-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float" style={{ animationDelay: '4s' }}></div>
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float"></div>
+        <div className="absolute top-20 left-0 w-[400px] h-[400px] bg-purple-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float" style={{ animationDelay: '2s' }}></div>
       </div>
 
       {/* Navbar */}
@@ -478,74 +477,112 @@ export default function App() {
 
       <main className="pt-24 sm:pt-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-16 lg:space-y-24 relative z-10">
         
-        {/* Hero Section */}
-        <section className="relative overflow-hidden rounded-[2.5rem] bg-slate-900 shadow-2xl ring-1 ring-white/10">
-          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 mix-blend-overlay"></div>
-          {/* Abstract Glows */}
-          <div className="absolute top-0 right-0 -mr-32 -mt-32 w-[30rem] h-[30rem] rounded-full bg-indigo-500 opacity-30 blur-[100px] animate-pulse-glow"></div>
-          <div className="absolute bottom-0 left-0 -ml-32 -mb-32 w-[25rem] h-[25rem] rounded-full bg-rose-500 opacity-20 blur-[100px]"></div>
-          
-          <div className="relative z-10 px-8 py-16 sm:px-16 sm:py-24 lg:flex lg:items-center lg:justify-between gap-16">
-            <div className="max-w-2xl lg:w-1/2">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-indigo-100 text-xs font-bold mb-8 backdrop-blur-md shadow-lg">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-400"></span>
-                </span>
-                115 學年度最新資訊已更新
+        {/* Redesigned Hero Section */}
+        <section className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-indigo-600 via-violet-600 to-purple-700 shadow-2xl ring-1 ring-white/10 group isolate">
+          {/* Background Effects */}
+          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-soft-light"></div>
+          <div className="absolute top-[-50%] left-[-20%] w-[80%] h-[150%] rounded-full bg-gradient-to-br from-indigo-400/30 to-purple-400/30 blur-3xl animate-float"></div>
+          <div className="absolute bottom-[-50%] right-[-20%] w-[80%] h-[150%] rounded-full bg-gradient-to-tl from-fuchsia-400/30 to-rose-400/30 blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
+
+          <div className="relative z-10 grid lg:grid-cols-2 gap-12 lg:gap-8 items-center p-8 sm:p-12 lg:p-16">
+            
+            {/* Left Content */}
+            <div className="flex flex-col gap-6 lg:gap-8">
+              <div className="inline-flex items-center gap-2 self-start px-4 py-2 rounded-full bg-white/10 border border-white/20 backdrop-blur-md shadow-lg animate-in slide-in-from-left-5 duration-700">
+                 <span className="relative flex h-2.5 w-2.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                 </span>
+                 <span className="text-white/90 text-sm font-bold tracking-wide">115 學年度最新資訊已更新</span>
               </div>
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight mb-8 leading-[1.15]">
-                探索屬於你的 <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 via-violet-300 to-rose-300 animate-gradient-x">
-                  最佳升學路徑
-                </span>
+
+              <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black tracking-tight text-white leading-[1.1] animate-in slide-in-from-bottom-5 duration-700 delay-100">
+                 探索屬於你的
+                 <br />
+                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-200 to-cyan-300 drop-shadow-sm">
+                   最佳升學路徑
+                 </span>
               </h1>
-              <p className="text-slate-300 text-lg sm:text-xl mb-10 leading-relaxed max-w-lg font-medium">
+
+              <p className="text-lg sm:text-xl text-indigo-100 font-medium leading-relaxed max-w-xl animate-in slide-in-from-bottom-5 duration-700 delay-200">
                 我們為你整理了 115 學年度最完整的升學策略與關鍵時程，助你從容應對學測、統測與分科測驗，不錯過任何重要時刻。
               </p>
-              
-              <div className="flex flex-col sm:flex-row gap-4">
-                <a href="#dashboard" className="px-8 py-4 bg-white text-slate-900 rounded-2xl font-bold hover:bg-indigo-50 transition-all shadow-xl shadow-indigo-900/20 hover:-translate-y-1 flex items-center justify-center gap-2 group">
+
+              <div className="flex flex-wrap gap-4 animate-in slide-in-from-bottom-5 duration-700 delay-300">
+                <a 
+                  href="#dashboard" 
+                  className="px-8 py-4 bg-white text-indigo-700 rounded-2xl font-bold text-lg hover:bg-indigo-50 hover:shadow-xl hover:shadow-indigo-900/20 hover:-translate-y-1 transition-all flex items-center gap-2 group/btn"
+                >
                   查看倒數
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
+                </a>
+                <a 
+                   href="#paths"
+                   className="px-8 py-4 bg-indigo-800/40 border border-white/20 text-white rounded-2xl font-bold text-lg hover:bg-indigo-800/60 hover:border-white/40 transition-all backdrop-blur-md"
+                >
+                   了解管道
                 </a>
               </div>
             </div>
 
-            {/* Category Selector Widget */}
-            <div className="mt-12 lg:mt-0 lg:w-1/2 max-w-md mx-auto lg:mx-0">
-              <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-3 rounded-3xl shadow-2xl">
-                <div className="flex flex-col gap-3">
-                  {CATEGORIES.map((cat) => (
-                    <button
-                      key={cat.id}
-                      onClick={() => handleCategoryChange(cat.id)}
-                      className={`relative px-6 py-5 rounded-2xl text-left transition-all duration-300 group border ${
-                        activeCategory === cat.id
-                          ? 'bg-white border-white/50 shadow-xl scale-[1.02] z-10'
-                          : 'bg-white/5 border-transparent hover:bg-white/10'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <span className={`block font-bold text-lg mb-1 ${activeCategory === cat.id ? 'text-slate-900' : 'text-white'}`}>
-                            {cat.label}
-                          </span>
-                          <span className={`text-sm ${activeCategory === cat.id ? 'text-slate-500' : 'text-slate-400 group-hover:text-slate-300'}`}>
-                            {cat.description}
-                          </span>
-                        </div>
-                        {activeCategory === cat.id && (
-                          <div className="bg-indigo-100 p-2 rounded-full">
-                            <CheckCircle2 className="w-6 h-6 text-indigo-600" />
-                          </div>
-                        )}
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
+            {/* Right Interactive Widget */}
+            <div className="relative animate-in zoom-in-95 duration-700 delay-200 lg:pl-10">
+               <div className="absolute inset-0 bg-indigo-500/10 blur-3xl -z-10 rounded-full"></div>
+               <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-[2rem] p-6 shadow-2xl relative overflow-hidden">
+                  <div className="absolute top-0 right-0 p-4 opacity-20">
+                     <Zap className="w-24 h-24 text-white rotate-12" />
+                  </div>
+                  
+                  <div className="flex items-center gap-3 mb-6">
+                     <div className="p-3 bg-white/20 rounded-xl text-white">
+                        <User className="w-6 h-6" />
+                     </div>
+                     <h3 className="text-xl font-bold text-white">請選擇你的目前身分</h3>
+                  </div>
+
+                  <div className="space-y-3">
+                     {CATEGORIES.map((cat) => (
+                        <button
+                          key={cat.id}
+                          onClick={() => handleCategoryChange(cat.id)}
+                          className={`w-full group relative flex items-center justify-between p-4 rounded-xl border transition-all duration-300 overflow-hidden ${
+                            activeCategory === cat.id
+                              ? 'bg-white border-white shadow-lg scale-[1.02]'
+                              : 'bg-black/20 border-white/10 hover:bg-black/30 hover:border-white/30'
+                          }`}
+                        >
+                           <div className="flex items-center gap-4 relative z-10">
+                              <div className={`w-2 h-10 rounded-full transition-colors ${
+                                 activeCategory === cat.id ? 'bg-indigo-600' : 'bg-white/20'
+                              }`}></div>
+                              <div className="text-left">
+                                 <div className={`font-bold text-lg ${
+                                    activeCategory === cat.id ? 'text-slate-900' : 'text-white'
+                                 }`}>
+                                    {cat.label}
+                                 </div>
+                                 <div className={`text-xs ${
+                                    activeCategory === cat.id ? 'text-slate-500' : 'text-indigo-200'
+                                 }`}>
+                                    {cat.description}
+                                 </div>
+                              </div>
+                           </div>
+                           
+                           {activeCategory === cat.id && (
+                              <div className="relative z-10 bg-indigo-100 p-2 rounded-full text-indigo-600 animate-in zoom-in spin-in-12 duration-300">
+                                 <Check className="w-5 h-5" strokeWidth={3} />
+                              </div>
+                           )}
+                           
+                           {/* Hover Effect */}
+                           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+                        </button>
+                     ))}
+                  </div>
+               </div>
             </div>
+
           </div>
         </section>
 
