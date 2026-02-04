@@ -527,7 +527,7 @@ export const IMPORTANT_DATES: ImportantDate[] = [
     isHighlight: false,
   },
   {
-    date: '115/08 中旬',
+    date: '115/08/13 上午9點',
     title: '大學分發放榜',
     description: '大學分發入學錄取公告。',
     category: ['high_school'],
