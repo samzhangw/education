@@ -192,7 +192,7 @@ export const ADMISSION_PATHS: Record<StudentCategory, AdmissionPath[]> = {
       details: [
         '第一階段：統測成績篩選',
         '第二階段：指定項目甄試 (面試、實作)',
-        '最多申請 3 個校系'
+        '最多申請 6 個校系'
       ],
       suitability: '統測成績中上、具備審資料者',
       pros: [
@@ -201,7 +201,7 @@ export const ADMISSION_PATHS: Record<StudentCategory, AdmissionPath[]> = {
         '有機會透過備審彌補學科分數'
       ],
       cons: [
-        '僅能報名 3 個志願，選擇較少',
+        '僅能報名 6 個志願，選擇較少',
         '需準備備審資料與面試',
         '期程較長'
       ],
