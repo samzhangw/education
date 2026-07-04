@@ -50,14 +50,14 @@ export default function PrintScheduleModal({ isOpen, onClose, category, paths, d
   };
 
   return (
-    <div className="fixed inset-0 z-[90] flex items-center justify-center p-4 print:block print:p-0 print:absolute print:inset-0 print:bg-white print:z-[9999]">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 print:block print:p-0 print:absolute print:inset-0 print:bg-white print:z-[9999]">
       {/* Backdrop - Hidden on Print */}
       <div 
-        className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity print:hidden" 
+        className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity print:hidden" 
         onClick={onClose}
       />
       
-      <div className="relative bg-white w-full max-w-3xl max-h-[90vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 print:shadow-none print:max-w-none print:max-h-none print:rounded-none print:h-auto print:w-full print:animate-none">
+      <div className="relative z-10 bg-white w-full max-w-3xl max-h-[90vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 print:shadow-none print:max-w-none print:max-h-none print:rounded-none print:h-auto print:w-full print:animate-none">
         
         {/* Header - Hidden on Print */}
         <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50 print:hidden">

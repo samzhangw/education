@@ -1,6 +1,6 @@
 import React from 'react';
 
-export type StudentCategory = 'high_school' | 'vocational' | 'junior_college';
+export type StudentCategory = 'high_school' | 'vocational' | 'junior_college' | 'freshman';
 
 export interface AdmissionPath {
   id: string;
@@ -21,6 +21,16 @@ export interface ImportantDate {
   description: string;
   category: StudentCategory[];
   isHighlight: boolean;
+}
+
+export interface PreparationTip {
+  id: string;
+  title: string;
+  summary: string;
+  content: string;
+  category: StudentCategory | 'general';
+  tags: string[];
+  iconName?: string;
 }
 
 export interface ChatMessage {
