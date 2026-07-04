@@ -67,6 +67,7 @@ export default function PathCard({ path, index, onOpenDetail, onSearchBrochure }
                <div className="flex items-center gap-2 shrink-0">
                     <button
                       onClick={(e) => onSearchBrochure(e, path)}
+                      aria-label={`搜尋 ${path.name} 簡章`}
                       className="w-10 h-10 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center hover:bg-slate-900 hover:text-white hover:border-slate-900 transition-all text-slate-500 shadow-sm"
                       title="搜尋簡章"
                     >

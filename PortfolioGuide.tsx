@@ -23,7 +23,7 @@ export default function PortfolioGuide({ userCategory = 'high_school' }: { userC
   ];
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8 animate-in fade-in duration-500">
+    <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in duration-500">
       
       {/* Header */}
       <section className="relative overflow-hidden rounded-[2.5rem] bg-white border border-slate-100 shadow-[0_8px_40px_rgba(0,0,0,0.04)] group isolate p-8 sm:p-12">
@@ -49,11 +49,14 @@ export default function PortfolioGuide({ userCategory = 'high_school' }: { userC
       {/* Main Content Layout */}
       <div className="flex flex-col lg:flex-row gap-8 items-start">
         {/* Tabs / Sidebar */}
-        <div className="w-full lg:w-64 shrink-0 sticky top-[72px] sm:top-24 z-30">
-          <div className="w-full flex lg:flex-col overflow-x-auto scrollbar-hide gap-2 p-1 lg:p-4 bg-slate-100/70 lg:bg-white rounded-2xl border border-slate-200/60 lg:border-slate-100 lg:shadow-sm backdrop-blur-md lg:backdrop-blur-none">
+        <div className="w-full lg:w-64 shrink-0 sticky top-[80px] lg:top-32 z-30">
+          <div role="tablist" aria-label="學習歷程指南" className="w-full flex lg:flex-col overflow-x-auto scrollbar-hide gap-2 p-1 lg:p-4 bg-slate-100/70 lg:bg-white rounded-2xl border border-slate-200/60 lg:border-slate-100 lg:shadow-sm backdrop-blur-md lg:backdrop-blur-none">
             {tabs.map(tab => (
               <button
                 key={tab.id}
+                role="tab"
+                aria-selected={activeTab === tab.id}
+                aria-controls={`panel-${tab.id}`}
                 onClick={() => setActiveTab(tab.id as any)}
                 className={`
                   flex items-center gap-3 px-4 sm:px-6 lg:px-4 py-3 rounded-xl font-bold text-sm whitespace-nowrap transition-all flex-1 justify-center lg:justify-start
@@ -78,7 +81,7 @@ export default function PortfolioGuide({ userCategory = 'high_school' }: { userC
         
         {/* Overview Tab */}
         {activeTab === 'overview' && (
-          <div className="space-y-8 animate-in slide-in-from-bottom-4 fade-in duration-300">
+          <div id="panel-overview" role="tabpanel" className="space-y-8 animate-in slide-in-from-bottom-4 fade-in duration-300">
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="p-6 bg-white rounded-3xl border border-slate-100 shadow-sm transition-transform hover:-translate-y-1">
                 <h3 className="text-slate-400 font-bold text-xs uppercase tracking-widest mb-2">上傳時間點</h3>
@@ -151,7 +154,7 @@ export default function PortfolioGuide({ userCategory = 'high_school' }: { userC
 
         {/* Course Tab */}
         {activeTab === 'course' && (
-           <div className="space-y-8 animate-in slide-in-from-right-8 fade-in duration-300">
+           <div id="panel-course" role="tabpanel" className="space-y-8 animate-in slide-in-from-right-8 fade-in duration-300">
              <div className="bg-white rounded-[2rem] p-8 sm:p-10 border border-slate-100 shadow-sm relative overflow-hidden">
                <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50/50 rounded-full blur-3xl -z-10"></div>
                <h2 className="text-2xl font-black text-slate-900 mb-6 flex items-center gap-3">
@@ -217,7 +220,7 @@ export default function PortfolioGuide({ userCategory = 'high_school' }: { userC
 
         {/* Extracurricular Tab */}
         {activeTab === 'extracurricular' && (
-           <div className="space-y-8 animate-in slide-in-from-right-8 fade-in duration-300">
+           <div id="panel-extracurricular" role="tabpanel" className="space-y-8 animate-in slide-in-from-right-8 fade-in duration-300">
              <div className="bg-white rounded-[2rem] p-8 sm:p-10 border border-slate-100 shadow-sm relative overflow-hidden">
                <div className="absolute top-0 right-0 w-64 h-64 bg-amber-50/50 rounded-full blur-3xl -z-10"></div>
                <h2 className="text-2xl font-black text-slate-900 mb-6 flex items-center gap-3">
@@ -283,7 +286,7 @@ export default function PortfolioGuide({ userCategory = 'high_school' }: { userC
 
         {/* Reflection Tab */}
         {activeTab === 'reflection' && (
-          <div className="space-y-8 animate-in slide-in-from-right-8 fade-in duration-300">
+          <div id="panel-reflection" role="tabpanel" className="space-y-8 animate-in slide-in-from-right-8 fade-in duration-300">
              <div className="bg-white rounded-[2rem] p-8 sm:p-10 border border-slate-100 shadow-sm relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-50/50 rounded-full blur-3xl -z-10"></div>
                 <h2 className="text-2xl font-black text-slate-900 mb-6 flex items-center gap-3">
@@ -340,7 +343,7 @@ export default function PortfolioGuide({ userCategory = 'high_school' }: { userC
 
         {/* Optimization Tab */}
         {activeTab === 'optimization' && (
-          <div className="space-y-8 animate-in slide-in-from-right-8 fade-in duration-300">
+          <div id="panel-optimization" role="tabpanel" className="space-y-8 animate-in slide-in-from-right-8 fade-in duration-300">
              <div className="bg-white rounded-[2rem] p-8 sm:p-10 border border-slate-100 shadow-sm relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-50/50 rounded-full blur-3xl -z-10"></div>
                 <h2 className="text-2xl font-black text-slate-900 mb-6 flex items-center gap-3">
@@ -487,7 +490,7 @@ export default function PortfolioGuide({ userCategory = 'high_school' }: { userC
 
         {/* Tips Tab */}
         {activeTab === 'tips' && (
-           <div className="space-y-8 animate-in slide-in-from-right-8 fade-in duration-300">
+           <div id="panel-tips" role="tabpanel" className="space-y-8 animate-in slide-in-from-right-8 fade-in duration-300">
               <div className="grid lg:grid-cols-2 gap-8">
                 {/* Do's */}
                 <div className="bg-emerald-50/50 rounded-[2rem] p-8 border border-emerald-100 shadow-sm relative overflow-hidden">

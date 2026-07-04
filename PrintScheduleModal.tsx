@@ -70,7 +70,7 @@ export default function PrintScheduleModal({ isOpen, onClose, category, paths, d
                <p className="text-sm text-slate-500 font-medium">選擇您關注的升學管道，建立專屬清單</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-slate-200 rounded-full text-slate-500 transition-colors">
+          <button onClick={onClose} className="p-2 hover:bg-slate-200 rounded-full text-slate-500 transition-colors" aria-label="關閉列印視窗">
             <X className="w-6 h-6" />
           </button>
         </div>

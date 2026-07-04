@@ -147,6 +147,7 @@ export default function App() {
   const [timelineFilters, setTimelineFilters] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [tipsSearchTerm, setTipsSearchTerm] = useState('');
+  const scrollPositions = React.useRef<{ [key: string]: number }>({});
 
   const activePaths = ADMISSION_PATHS[activeCategory];
   
@@ -190,19 +191,50 @@ export default function App() {
   // Wrapper for category change to log it
   const handleCategoryChange = (id: StudentCategory) => {
     setActiveCategory(id);
+    setCurrentView('paths');
+    setSelectedPathDetail(null);
     sendUserLog('change_category', id);
     setIsCategoryMenuOpen(false);
     setIsDrawerOpen(false);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    setTimeout(() => {
+      document.getElementById('dashboard')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
   };
 
   const handleOpenPathDetail = (path: AdmissionPath) => {
+    scrollPositions.current['paths_main'] = window.scrollY;
     setSelectedPathDetail(path);
     sendUserLog('view_path_detail', path.id, path.title);
+    setTimeout(() => window.scrollTo({ top: 0, behavior: 'instant' }), 0);
+  };
+
+  const handleClosePathDetail = () => {
+    setSelectedPathDetail(null);
+    setTimeout(() => {
+      if (scrollPositions.current['paths_main'] !== undefined) {
+        window.scrollTo({ top: scrollPositions.current['paths_main'], behavior: 'instant' });
+      }
+    }, 0);
   };
 
   const handleCountdownClick = (toolName: string, url: string) => {
     sendUserLog('click_external_tool', toolName, url);
+  };
+
+  const handleOpenTip = (tip: PreparationTip) => {
+    scrollPositions.current['tips_main'] = window.scrollY;
+    setSelectedTip(tip);
+    setTimeout(() => window.scrollTo({ top: 0, behavior: 'instant' }), 0);
+  };
+
+  const handleCloseTip = () => {
+    setSelectedTip(null);
+    setTimeout(() => {
+      if (scrollPositions.current['tips_main'] !== undefined) {
+        window.scrollTo({ top: scrollPositions.current['tips_main'], behavior: 'instant' });
+      }
+    }, 0);
   };
 
   const toggleTimelineFilter = (id: string) => {
@@ -303,7 +335,7 @@ export default function App() {
   }, [currentView, selectedPathDetail, selectedTip]);
 
   return (
-    <div className="min-h-screen font-sans pb-24 relative overflow-hidden mesh-bg text-slate-800">
+    <div className="min-h-screen font-sans pb-24 relative text-slate-800">
       <Helmet>
         <title>{seoMetadata.title}</title>
         <meta name="description" content={seoMetadata.description} />
@@ -314,21 +346,22 @@ export default function App() {
       </Helmet>
       
       {/* Delicate background patterns */}
+      <div className="fixed inset-0 z-[-1] overflow-hidden mesh-bg pointer-events-none"></div>
       <div className="fixed inset-0 z-0 pointer-events-none opacity-40">
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:32px_32px]"></div>
       </div>
 
       {/* Floating Navbar */}
       <div className="fixed top-4 left-0 right-0 z-50 flex justify-center px-4 sm:px-6 pointer-events-none">
-        <nav className="pointer-events-auto flex items-center justify-between w-full max-w-5xl bg-white/80 backdrop-blur-2xl px-5 py-3.5 rounded-2xl border border-white/60 shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-all">
-          <div className="flex items-center gap-3 group cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+        <nav className="pointer-events-auto flex items-center justify-between w-full max-w-6xl bg-white/80 backdrop-blur-2xl px-5 py-3.5 rounded-2xl border border-white/60 shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-all">
+          <button className="flex items-center gap-3 group cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} aria-label="回到最上方">
             <div className="relative flex items-center justify-center bg-slate-900 p-2.5 rounded-xl text-white shadow-sm shadow-slate-200">
                 <GraduationCap className="h-5 w-5" />
             </div>
             <span className="font-extrabold text-xl text-slate-900 tracking-tight">
               升大學管道
             </span>
-          </div>
+          </button>
           
           <div className="flex items-center gap-2 sm:gap-4">
             
@@ -404,6 +437,7 @@ export default function App() {
             <div className="flex items-center gap-1">
               <button 
                 onClick={() => setIsShareModalOpen(true)}
+                aria-label="分享頁面"
                 className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all duration-300 active:scale-95"
                 title="分享頁面"
               >
@@ -412,6 +446,7 @@ export default function App() {
 
               <button 
                 onClick={() => setIsDrawerOpen(true)}
+                aria-label="開啟選單"
                 className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all duration-300 active:scale-95"
               >
                 <Menu className="w-5 h-5" />
@@ -433,7 +468,7 @@ export default function App() {
                  <LayoutGrid className="w-5 h-5 text-indigo-500" />
                  <h3 className="font-bold text-lg">更多工具</h3>
               </div>
-              <button onClick={() => setIsDrawerOpen(false)} className="p-2 hover:bg-slate-100 rounded-full text-slate-500 transition-colors">
+              <button onClick={() => setIsDrawerOpen(false)} className="p-2 hover:bg-slate-100 rounded-full text-slate-500 transition-colors" aria-label="關閉選單">
                  <X className="w-5 h-5" />
               </button>
            </div>
@@ -547,7 +582,7 @@ export default function App() {
                   </div>
                   <h3 className="font-bold text-slate-800">分享頁面</h3>
                 </div>
-                <button onClick={() => setIsShareModalOpen(false)} className="p-1 rounded-full hover:bg-slate-200 text-slate-500 transition-colors">
+                <button onClick={() => setIsShareModalOpen(false)} className="p-1 rounded-full hover:bg-slate-200 text-slate-500 transition-colors" aria-label="關閉分享">
                   <X className="w-5 h-5" />
                 </button>
              </div>
@@ -611,9 +646,9 @@ export default function App() {
       />
 
       {currentView === 'paths' && (
-        <main className="pt-28 sm:pt-32 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto space-y-16 lg:space-y-24 relative z-10 min-h-[70vh]">
+        <main className="pt-28 sm:pt-32 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto space-y-16 lg:space-y-24 relative z-10 min-h-[70vh]">
           {selectedPathDetail ? (
-             <PathDetailView path={selectedPathDetail} onClose={() => setSelectedPathDetail(null)} />
+             <PathDetailView path={selectedPathDetail} onClose={handleClosePathDetail} />
           ) : (
             <>
               {/* Redesigned Minimalist Hero Section */}
@@ -621,39 +656,37 @@ export default function App() {
           <div className="absolute inset-0 bg-gradient-to-br from-slate-50 to-white"></div>
           <div className="absolute right-0 top-0 w-1/2 h-full bg-gradient-to-bl from-indigo-50/50 to-transparent"></div>
 
-          <div className="relative z-10 grid lg:grid-cols-2 gap-12 lg:gap-8 items-center p-8 sm:p-14 lg:p-20">
+          <div className="relative z-10 grid lg:grid-cols-[1.1fr_0.9fr] gap-12 lg:gap-8 items-center p-8 sm:p-14 lg:p-12 xl:p-16">
             
             {/* Left Content */}
             <div className="flex flex-col gap-8">
-              <div className="inline-flex items-center gap-2 self-start px-4 py-2 rounded-full bg-slate-100 border border-slate-200">
-                 <span className="relative flex h-2.5 w-2.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-indigo-500"></span>
-                 </span>
-                 <span className="text-slate-700 text-sm font-bold tracking-wide">115 / 116 學年度資訊已更新</span>
+              <div className="inline-flex items-center gap-2.5 self-start px-5 py-2.5 rounded-full bg-gradient-to-r from-indigo-50 to-violet-50 border border-indigo-100/50 shadow-sm relative overflow-hidden group">
+                 <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-violet-500/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out"></div>
+                 <Sparkles className="w-4 h-4 text-indigo-500" />
+                 <span className="text-indigo-700 text-sm font-bold tracking-wide relative z-10">115 / 116 學年度資訊已更新</span>
               </div>
 
-              <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black tracking-tight text-slate-900 leading-[1.15]">
+              <h1 className="text-4xl sm:text-5xl lg:text-[3.5rem] xl:text-[4rem] font-black tracking-tight text-slate-900 leading-[1.15] whitespace-nowrap">
                  探索屬於你的
                  <br />
-                 <span className="text-indigo-600">最佳升學路徑</span>
+                 <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-violet-600 to-fuchsia-600">最佳升學路徑</span>
               </h1>
 
-              <p className="text-lg text-slate-500 font-medium leading-relaxed max-w-xl">
+              <p className="text-lg text-slate-600 font-medium leading-relaxed max-w-xl">
                 我們為你整理了 115 學年度最完整的升學策略與關鍵時程，助你從容應對學測、統測與分科測驗，不錯過任何重要時刻。
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-4 mt-6">
+              <div className="flex flex-col sm:flex-row gap-4 mt-8">
                 <a 
                   href="#dashboard" 
-                  className="w-full sm:w-auto px-8 py-4 bg-slate-900 text-white rounded-2xl font-bold text-lg hover:bg-slate-800 hover:shadow-xl hover:shadow-slate-200 hover:-translate-y-1 transition-all flex items-center justify-center gap-2 group/btn"
+                  className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-2xl font-bold text-lg shadow-lg shadow-indigo-200 hover:shadow-xl hover:shadow-indigo-300 hover:-translate-y-1 transition-all flex items-center justify-center gap-2 group/btn"
                 >
                   查看倒數
                   <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
                 </a>
                 <a 
                    href="#paths"
-                   className="w-full sm:w-auto px-8 py-4 bg-white border border-slate-200 text-slate-700 rounded-2xl font-bold text-lg hover:bg-slate-50 transition-all shadow-sm flex items-center justify-center"
+                   className="w-full sm:w-auto px-8 py-4 bg-white border-2 border-slate-200 text-slate-700 rounded-2xl font-bold text-lg hover:border-indigo-200 hover:bg-indigo-50/50 hover:text-indigo-600 transition-all shadow-sm flex items-center justify-center"
                 >
                    了解管道
                 </a>
@@ -661,55 +694,63 @@ export default function App() {
             </div>
 
             {/* Right Interactive Widget */}
-            <div className="relative lg:pl-10">
-               <div className="glass-panel rounded-[2rem] p-8 shadow-xl relative overflow-hidden">
-                  <div className="flex items-center gap-4 mb-8">
-                     <div className="p-3 bg-indigo-50 rounded-xl text-indigo-600">
+            <div className="relative lg:pl-4">
+               <div className="bg-white/80 backdrop-blur-2xl rounded-[2.5rem] p-6 sm:p-8 shadow-xl border border-white/60 relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-50/50 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2"></div>
+                  
+                  <div className="flex items-center gap-4 mb-6 sm:mb-8">
+                     <div className="p-3 bg-indigo-50 rounded-2xl text-indigo-600 shadow-sm border border-indigo-100">
                         <User className="w-6 h-6" />
                      </div>
-                     <h3 className="text-xl font-bold text-slate-800">請選擇你的目前身分</h3>
+                     <div>
+                       <h3 className="text-xl sm:text-2xl font-black text-slate-800 tracking-tight">請選擇你的目前身分</h3>
+                       <p className="text-xs sm:text-sm font-medium text-slate-500 mt-1">為你推薦專屬升學資訊</p>
+                     </div>
                   </div>
-
-                  <div className="space-y-4">
-                     {CATEGORIES.map((cat) => (
+                  
+                  <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
+                     {CATEGORIES.map((cat) => {
+                        const isActive = activeCategory === cat.id;
+                        return (
                         <button
                           key={cat.id}
                           onClick={() => handleCategoryChange(cat.id)}
-                          className={`w-full group relative flex items-center justify-between p-5 rounded-2xl border transition-all duration-300 ${
-                            activeCategory === cat.id
-                              ? 'bg-slate-900 border-slate-900 shadow-md scale-[1.02]'
-                              : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                          className={`w-full group relative flex flex-col p-5 sm:p-6 rounded-3xl border transition-all duration-300 text-left h-full ${
+                            isActive
+                              ? 'bg-slate-900 border-slate-900 shadow-xl shadow-slate-900/10 scale-[1.02]'
+                              : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50 hover:shadow-md'
                           }`}
                         >
-                           <div className="flex items-center gap-4 relative z-10">
-                              <div className={`w-1.5 h-12 rounded-full transition-colors ${
-                                 activeCategory === cat.id ? 'bg-indigo-400' : 'bg-slate-200'
-                              }`}></div>
-                              <div className="text-left">
-                                 <div className={`font-bold text-lg mb-0.5 ${
-                                    activeCategory === cat.id ? 'text-white' : 'text-slate-800'
-                                 }`}>
-                                    {cat.label}
-                                 </div>
-                                 <div className={`text-sm ${
-                                    activeCategory === cat.id ? 'text-slate-400' : 'text-slate-500'
-                                 }`}>
-                                    {cat.description}
-                                 </div>
+                           <div className="flex items-center justify-between w-full mb-4">
+                              <div className={`p-2.5 rounded-xl transition-colors ${
+                                isActive ? 'bg-indigo-500/20 text-indigo-300' : 'bg-slate-100 text-slate-500 group-hover:bg-indigo-50 group-hover:text-indigo-600'
+                              }`}>
+                                {cat.id === 'high_school' ? <BookOpen className="w-5 h-5" /> :
+                                 cat.id === 'vocational' ? <Zap className="w-5 h-5" /> :
+                                 cat.id === 'junior_college' ? <Target className="w-5 h-5" /> :
+                                 <Sparkles className="w-5 h-5" />}
+                              </div>
+                              <div className={`w-7 h-7 rounded-full flex items-center justify-center transition-all ${
+                                isActive ? 'bg-indigo-500 text-white' : 'bg-slate-100 text-slate-400 group-hover:bg-slate-200 group-hover:text-slate-600'
+                              }`}>
+                                <ArrowRight className={`w-4 h-4 transition-transform duration-300 ${isActive ? 'rotate-[-45deg]' : ''}`} />
                               </div>
                            </div>
-                           
-                           {activeCategory === cat.id && (
-                              <div className="relative z-10 bg-white/10 p-2.5 rounded-full text-white">
-                                 <Check className="w-5 h-5" strokeWidth={3} />
-                              </div>
-                           )}
+                           <div className={`font-black text-lg sm:text-xl tracking-tight mb-1.5 ${
+                              isActive ? 'text-white' : 'text-slate-800'
+                           }`}>
+                              {cat.label}
+                           </div>
+                           <div className={`text-xs sm:text-sm font-medium leading-relaxed ${
+                              isActive ? 'text-slate-400' : 'text-slate-500'
+                           }`}>
+                              {cat.description}
+                           </div>
                         </button>
-                     ))}
+                     )})}
                   </div>
                </div>
             </div>
-
           </div>
         </section>
 
@@ -884,7 +925,7 @@ export default function App() {
       )}
 
       {currentView === 'timeline' && (
-      <main className="pt-28 sm:pt-32 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto space-y-8 relative z-10 min-h-[70vh]">
+      <main className="pt-28 sm:pt-32 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto space-y-8 relative z-10 min-h-[70vh]">
           {/* Timeline Section */}
           <div className="w-full">
             <div className="space-y-4">
@@ -967,6 +1008,7 @@ export default function App() {
                 <div className="flex items-center gap-2 px-2 pb-1">
                   <Search className="w-4 h-4 text-slate-400 shrink-0" />
                   <input
+                    aria-label="搜尋重要日程"
                     type="text"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
@@ -975,7 +1017,8 @@ export default function App() {
                   />
                   {searchTerm && (
                     <button 
-                      onClick={() => setSearchTerm('')} 
+                      onClick={() => setSearchTerm('')}
+                      aria-label="清除搜尋" 
                       className="p-1 hover:bg-slate-100 rounded-full text-slate-400 transition-colors"
                       title="清除搜尋"
                     >
@@ -1086,10 +1129,10 @@ export default function App() {
                       {calendarMonth.getFullYear()}年 {calendarMonth.getMonth() + 1}月
                     </h3>
                     <div className="flex gap-2">
-                       <button onClick={() => setCalendarMonth(new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() - 1, 1))} className="p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-600 transition-colors border border-slate-100">
+                       <button aria-label="上個月" onClick={() => setCalendarMonth(new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() - 1, 1))} className="p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-600 transition-colors border border-slate-100">
                           <ChevronDown className="w-5 h-5 rotate-90" />
                        </button>
-                       <button onClick={() => setCalendarMonth(new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 1))} className="p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-600 transition-colors border border-slate-100">
+                       <button aria-label="下個月" onClick={() => setCalendarMonth(new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 1))} className="p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-600 transition-colors border border-slate-100">
                           <ChevronDown className="w-5 h-5 -rotate-90" />
                        </button>
                     </div>
@@ -1152,7 +1195,7 @@ export default function App() {
              <article className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 relative z-10 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div className="flex flex-row items-center justify-between gap-4 mb-8">
                   <button 
-                    onClick={() => setSelectedTip(null)}
+                    onClick={handleCloseTip}
                     className="inline-flex items-center w-fit gap-2 px-3 sm:px-4 py-2 bg-white border border-slate-200 text-slate-600 font-bold text-xs sm:text-sm rounded-xl hover:bg-slate-50 hover:text-indigo-600 transition-all shadow-sm group whitespace-nowrap"
                   >
                     <ArrowRight className="w-4 h-4 rotate-180 group-hover:-translate-x-1 transition-transform" />
@@ -1162,17 +1205,17 @@ export default function App() {
 
                   <div className="flex items-center gap-1 sm:gap-2 bg-white border border-slate-200 rounded-xl p-1 shadow-sm shrink-0">
                     <div className="flex items-center gap-1 border-r border-slate-200 pr-2 mr-1">
-                      <button onClick={() => setArticleFontSize('sm')} className={`p-1.5 rounded-lg font-bold transition-colors ${articleFontSize === 'sm' ? 'bg-indigo-50 text-indigo-700' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'}`} title="小字體">
+                      <button onClick={() => setArticleFontSize('sm')} className={`p-1.5 rounded-lg font-bold transition-colors ${articleFontSize === 'sm' ? 'bg-indigo-50 text-indigo-700' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'}`} title="小字體" aria-label="小字體">
                         <Type className="w-3 h-3" />
                       </button>
-                      <button onClick={() => setArticleFontSize('base')} className={`p-1.5 rounded-lg font-bold transition-colors ${articleFontSize === 'base' ? 'bg-indigo-50 text-indigo-700' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'}`} title="中字體">
+                      <button onClick={() => setArticleFontSize('base')} className={`p-1.5 rounded-lg font-bold transition-colors ${articleFontSize === 'base' ? 'bg-indigo-50 text-indigo-700' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'}`} title="中字體" aria-label="中字體">
                         <Type className="w-4 h-4" />
                       </button>
-                      <button onClick={() => setArticleFontSize('lg')} className={`p-1.5 rounded-lg font-bold transition-colors ${articleFontSize === 'lg' ? 'bg-indigo-50 text-indigo-700' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'}`} title="大字體">
+                      <button onClick={() => setArticleFontSize('lg')} className={`p-1.5 rounded-lg font-bold transition-colors ${articleFontSize === 'lg' ? 'bg-indigo-50 text-indigo-700' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'}`} title="大字體" aria-label="大字體">
                         <Type className="w-5 h-5" />
                       </button>
                     </div>
-                    <button onClick={() => setArticleTheme(articleTheme === 'light' ? 'dark' : 'light')} className="p-1.5 rounded-lg text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition-colors" title={articleTheme === 'light' ? '切換深色模式' : '切換淺色模式'}>
+                    <button onClick={() => setArticleTheme(articleTheme === 'light' ? 'dark' : 'light')} className="p-1.5 rounded-lg text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition-colors" title={articleTheme === 'light' ? '切換深色模式' : '切換淺色模式'} aria-label={articleTheme === 'light' ? '切換深色模式' : '切換淺色模式'}>
                       {articleTheme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
                     </button>
                   </div>
@@ -1235,7 +1278,7 @@ export default function App() {
                       .sort((a, b) => b.matchCount - a.matchCount)
                       .slice(0, 3)
                       .map(({tip}) => (
-                        <div key={tip.id} className={`rounded-2xl p-5 sm:p-6 shadow-sm hover:shadow-lg transition-all duration-300 group flex flex-col h-full cursor-pointer hover:-translate-y-1 ${articleTheme === 'dark' ? 'bg-slate-900 border border-slate-800 hover:border-indigo-500/50' : 'bg-white border border-slate-100 hover:border-indigo-100'}`} onClick={() => { setSelectedTip(tip); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
+                        <div key={tip.id} className={`rounded-2xl p-5 sm:p-6 shadow-sm hover:shadow-lg transition-all duration-300 group flex flex-col h-full cursor-pointer hover:-translate-y-1 ${articleTheme === 'dark' ? 'bg-slate-900 border border-slate-800 hover:border-indigo-500/50' : 'bg-white border border-slate-100 hover:border-indigo-100'}`} onClick={() => handleOpenTip(tip)}>
                            <div className="flex flex-wrap gap-1.5 mb-3">
                               {tip.tags.slice(0, 2).map(tag => (
                                  <span key={tag} className={`px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-md border transition-colors ${articleTheme === 'dark' ? 'bg-slate-800 text-slate-400 border-slate-700 group-hover:border-indigo-500/30 group-hover:text-indigo-300' : 'bg-slate-50 text-slate-500 border-slate-100 group-hover:border-indigo-100 group-hover:bg-indigo-50/50 group-hover:text-indigo-600'}`}>{tag}</span>
@@ -1265,6 +1308,7 @@ export default function App() {
                       <Search className="h-5 w-5 text-slate-400" />
                    </div>
                    <input
+                      aria-label="搜尋文章標題、標籤或摘要"
                       type="text"
                       className="block w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-2xl text-base sm:text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm"
                       placeholder="搜尋文章標題、標籤或摘要..."
@@ -1283,7 +1327,7 @@ export default function App() {
                               tip.tags.some(tag => tag.toLowerCase().includes(term));
                     })
                     .map(tip => (
-                      <div key={tip.id} className="bg-white rounded-[2rem] p-6 shadow-sm hover:shadow-xl hover:shadow-indigo-900/5 border border-slate-100 hover:border-indigo-100 transition-all duration-300 group flex flex-col h-full cursor-pointer hover:-translate-y-1" onClick={() => { setSelectedTip(tip); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
+                      <div key={tip.id} className="bg-white rounded-[2rem] p-6 shadow-sm hover:shadow-xl hover:shadow-indigo-900/5 border border-slate-100 hover:border-indigo-100 transition-all duration-300 group flex flex-col h-full cursor-pointer hover:-translate-y-1" onClick={() => handleOpenTip(tip)}>
                           <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300 shadow-inner">
                               {tip.iconName === 'user' ? <User className="w-6 h-6" /> : 
                                tip.iconName === 'file' ? <FileText className="w-6 h-6" /> : 
@@ -1356,25 +1400,25 @@ export default function App() {
       )}
 
       {currentView === 'portfolio' && (
-        <main className="pt-28 sm:pt-32 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto space-y-16 lg:space-y-24 relative z-10 min-h-[70vh]">
+        <main className="pt-28 sm:pt-32 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto space-y-16 lg:space-y-24 relative z-10 min-h-[70vh]">
            <PortfolioGuide userCategory={activeCategory} />
         </main>
       )}
 
       {currentView === 'about' && (
-        <main className="pt-28 sm:pt-32 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto relative z-10 min-h-[70vh]">
+        <main className="pt-28 sm:pt-32 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto relative z-10 min-h-[70vh]">
            <AboutUs />
         </main>
       )}
 
       {currentView === 'privacy' && (
-        <main className="pt-28 sm:pt-32 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto relative z-10 min-h-[70vh]">
+        <main className="pt-28 sm:pt-32 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto relative z-10 min-h-[70vh]">
            <PrivacyPolicy />
         </main>
       )}
 
       {currentView === 'disclaimer' && (
-        <main className="pt-28 sm:pt-32 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto relative z-10 min-h-[70vh]">
+        <main className="pt-28 sm:pt-32 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto relative z-10 min-h-[70vh]">
            <Disclaimer />
         </main>
       )}

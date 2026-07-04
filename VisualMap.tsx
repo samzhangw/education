@@ -43,6 +43,9 @@ const VisualMap: React.FC<VisualMapProps> = ({ activeCategory, onPathClick }) =>
 
     return (
       <div 
+        role={isClickable ? "button" : undefined}
+        tabIndex={isClickable ? 0 : undefined}
+        onKeyDown={(e) => { if (isClickable && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); onPathClick(path); } }}
         onClick={() => isClickable && onPathClick(path)}
         className={`relative flex flex-col p-4 rounded-[1.25rem] border-2 transition-all duration-300 ${isClickable ? 'cursor-pointer hover:-translate-y-1' : ''} ${colorClasses} w-[160px] sm:w-[180px] shadow-sm bg-white/80 backdrop-blur-sm z-10 group`}
       >

@@ -192,6 +192,7 @@ export default function Chat({ currentCategory }: ChatProps) {
               className="relative"
             >
               <input
+                aria-label="輸入問題"
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
